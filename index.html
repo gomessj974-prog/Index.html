@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gerador de Sistemas com ChatGPT</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#f5f7fb;--card:#ffffff;--text:#1c2433;--muted:#5a6578;--accent:#2f6fed;--accent2:#7b4dff;--code:#0f1420;--codetext:#dbe6f7;--border:#e1e6f0}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0c0f16;--card:#151a25;--text:#e7ebf3;--muted:#9ba6b8;--accent:#5b9bff;--accent2:#9d7bff;--code:#080b11;--codetext:#d7e2f5;--border:#252d3c}}
+:root[data-theme="dark"]{--bg:#0c0f16;--card:#151a25;--text:#e7ebf3;--muted:#9ba6b8;--accent:#5b9bff;--accent2:#9d7bff;--code:#080b11;--codetext:#d7e2f5;--border:#252d3c}
+[hidden]{display:none!important}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;line-height:1.6}
+header{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;padding:44px 16px 40px;text-align:center}
+header h1{margin:0 0 8px;font-size:2rem}
+header p{margin:0 auto;max-width:640px;opacity:.92}
+.busca{max-width:820px;margin:22px auto 0}
+.caixa{display:flex;align-items:center;gap:8px;background:#fff;color:#1c2433;border-radius:14px;padding:6px 6px 6px 14px;box-shadow:0 8px 24px rgba(0,0,0,.2)}
+.caixa input[type=text]{flex:1;border:0;outline:0;font-size:1rem;padding:12px 4px;min-width:0;background:transparent;color:#1c2433}
+.caixa button,.btn,.anexar{background:var(--accent2);color:#fff;border:0;border-radius:10px;padding:11px 14px;font-weight:600;cursor:pointer;white-space:nowrap;font-size:.95rem}
+.anexar{background:#eef1f8;color:#1c2433;border:1px solid #d6dcea;font-weight:500}
+.btn{background:var(--accent);font-size:1rem;padding:12px 18px}
+button:disabled{opacity:.6;cursor:wait}
+.previa{position:relative;display:inline-block}
+.previa img{width:44px;height:44px;object-fit:cover;border-radius:8px;border:1px solid #d6dcea;display:block}
+.previa button{position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;padding:0;background:#222;color:#fff;font-size:12px;line-height:20px;border:0;cursor:pointer}
+.previa.txt{background:#eef1f8;color:#1c2433;border:1px solid #d6dcea;border-radius:8px;padding:8px 12px;font-size:.85rem;white-space:nowrap}
+.previa.txt span span{display:inline-block;max-width:150px;overflow:hidden;text-overflow:ellipsis;vertical-align:middle}
+.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:12px}
+.chip{background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:5px 12px;font-size:.85rem;cursor:pointer}
+main{max-width:960px;margin:0 auto;padding:24px 16px 48px}
+section{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px}
+h2{margin:0 0 10px;color:var(--accent);font-size:1.4rem}
+.muted{color:var(--muted)}
+pre{position:relative;background:var(--code);color:var(--codetext);padding:44px 16px 16px;border-radius:10px;overflow:auto;max-height:560px;font-size:12px;line-height:1.4;margin:12px 0}
+code{font-family:ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace}
+.copy{position:absolute;top:8px;right:8px;background:var(--accent);color:#fff;border:0;border-radius:6px;padding:4px 10px;font-size:.75rem;cursor:pointer}
+.tok-c{color:#6a9955}.tok-s{color:#ce9178}.tok-p{color:#c586c0}.tok-k{color:#569cd6;font-weight:600}.tok-n{color:#b5cea8}.tok-f{color:#dcdcaa}
+.cursor{display:inline-block;width:8px;height:1.1em;background:#5b9bff;vertical-align:text-bottom;animation:blink 1s steps(2) infinite}
+@keyframes blink{50%{opacity:0}}
+#status{font-weight:600;min-height:1.5em}
+.resumo{margin-top:14px;padding:14px 16px;border-left:4px solid var(--accent);background:var(--bg);border-radius:8px}
+.resumo h3{margin:0 0 6px;font-size:1rem;color:var(--accent)}
+.resumo p{margin:0;white-space:pre-wrap}
+.bloco{margin-top:14px}
+.ajuste{margin-top:14px;box-shadow:none;border:1px solid var(--border)}
+@media (max-width:600px){.caixa{flex-wrap:wrap}.caixa button{width:100%}header h1{font-size:1.6rem}}
+#imgSec .resultado{margin-top:14px;text-align:center}
+#imgSec img{max-width:100%;height:auto;border:1px solid var(--border);border-radius:10px;background:#fff}
+#imgStatus{font-weight:600;min-height:1.5em;margin:10px 0 0}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Gerador de Sistemas com ChatGPT</h1>
+  <p>Descreva o que você quer, use a imagem gerada na seção Gerar imagem ou envie um arquivo TXT, e a IA cria o sistema para você.</p>
+  <div class="busca">
+    <div class="caixa">
+      <span aria-hidden="true">🔍</span>
+      <span id="previa" class="previa" hidden><img id="imgprev" alt="Imagem enviada"><button id="tirar" type="button" aria-label="Remover imagem">×</button></span>
+      <span id="previaTxt" class="previa txt" hidden><span>📄 <span id="nomeTxt"></span></span><button id="tirarTxt" type="button" aria-label="Remover arquivo de texto">×</button></span>
+      <input id="pedido" type="text" placeholder="O que você quer criar? Ex.: sistema de economia com banco e loja" aria-label="O que você quer criar">
+      <button id="usaImg" class="anexar" type="button">📎 Usar imagem gerada</button>
+      <label class="anexar">📄 TXT<input id="txt" type="file" accept=".txt,text/plain" hidden></label>
+      <button id="criar" type="button">Criar com IA</button>
+    </div>
+    <div class="chips">
+      <button type="button" class="chip">Sistema de login com senha</button>
+      <button type="button" class="chip">Loja de veículos</button>
+      <button type="button" class="chip">Sistema de empregos</button>
+      <button type="button" class="chip">Página de portfólio em HTML</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section id="imgSec">
+    <h2>Gerar imagem</h2>
+    <p class="muted">O ChatGPT desenha a imagem em SVG, um desenho vetorial que pode ser baixado e editado.</p>
+    <div class="caixa">
+      <span aria-hidden="true">🔍</span>
+      <input id="imgPedido" type="text" placeholder="Descreva a imagem. Ex.: logo de um carro de corrida azul" aria-label="Descreva a imagem">
+      <button id="gerarImg" type="button">Gerar img</button>
+    </div>
+    <p id="imgStatus" class="muted"></p>
+    <div id="imgResultado" class="resultado" hidden>
+      <img id="imgFinal" alt="Imagem gerada pelo ChatGPT">
+      <div class="bloco"><button id="baixarImg" class="btn" type="button">⬇ Baixar imagem (.svg)</button></div>
+    </div>
+  </section>
+
+  <section id="gerador" hidden>
+    <h2>Resultado da IA</h2>
+    <p id="status" class="muted"></p>
+    <pre><code id="saida"></code></pre>
+    <div id="resumo" class="resumo" hidden><h3>O que a IA fez</h3><p id="textoResumo"></p></div>
+    <div id="acoes" class="bloco" hidden><button id="baixar" class="btn" type="button">⬇ Baixar código</button></div>
+    <div id="ajuste" class="caixa ajuste" hidden>
+      <span aria-hidden="true">🔍</span>
+      <span id="previaAj" class="previa" hidden><img id="imgprevAj" alt="Imagem da correção"><button id="tirarAj" type="button" aria-label="Remover imagem">×</button></span>
+      <span id="previaTxtAj" class="previa txt" hidden><span>📄 <span id="nomeTxtAj"></span></span><button id="tirarTxtAj" type="button" aria-label="Remover arquivo de texto">×</button></span>
+      <input id="ajustePedido" type="text" placeholder="Não ficou como queria? Diga o que mudar, use a imagem gerada ou envie TXT" aria-label="O que corrigir no sistema">
+      <button id="usaImgAj" class="anexar" type="button">📎 Usar imagem gerada</button>
+      <label class="anexar">📄 TXT<input id="txtAj" type="file" accept=".txt,text/plain" hidden></label>
+      <button id="ajusteBtn" type="button">Corrigir com IA</button>
+    </div>
+  </section>
+</main>
+
+<script>
+(function(){
+  var TOK=/(\/\/[^\n]*|\/\*[\s\S]*?\*\/)|("[^"\n]*")|(#\w+)|\b(new|public|stock|forward|native|if|else|for|while|return|switch|case|break|const|static|true|false)\b|\b(\d+\.?\d*)\b|\b([A-Za-z_]\w*)(?=\s*\()/g;
+  var CLS=['c','s','p','k','n','f'];
+  var MC='###CODIGO###', MR='###RESUMO###';
+  var MAX_TXT=300000;
+  var SUPORTADAS=['image/png','image/jpeg','image/webp','image/gif'];
+  var FORMATO='Responda somente neste formato, sem texto fora dele e sem blocos markdown:\n###CODIGO###\n(código completo, com comentários em português)\n###RESUMO###\n(resumo curto em português, de 3 a 6 frases, dizendo o que foi criado)';
+  var FORMATO_AJ='Responda somente neste formato, sem texto fora dele e sem blocos markdown:\n###CODIGO###\n(código completo já corrigido)\n###RESUMO###\n(resumo curto em português dizendo o que foi corrigido)';
+  var $=function(id){return document.getElementById(id);};
+  var input=$('pedido'),out=$('saida'),sec=$('gerador'),st=$('status'),btn=$('criar'),acoes=$('acoes'),baixar=$('baixar'),resBox=$('resumo'),resTxt=$('textoResumo'),ajuste=$('ajuste'),ajInput=$('ajustePedido'),ajBtn=$('ajusteBtn');
+  var codigo='',resumo='',texto='',pedidoOriginal='',agendado=false,finalizado=false,ocupado=false;
+
+  function aviso(m){ sec.hidden=false; st.textContent=m; }
+  function hl(src){
+    return src.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(TOK,function(m,a,b,c,d,e,f){
+      var g=[a,b,c,d,e,f];
+      for(var i=0;i<6;i++){ if(g[i]!==undefined) return '<span class="tok-'+CLS[i]+'">'+m+'</span>'; }
+      return m;
+    });
+  }
+  function limpa(t){ return t.replace(/^```[\w-]*\n?/,'').replace(/\n?```\s*$/,''); }
+  function separa(t){
+    var a=t.indexOf(MC), b=t.indexOf(MR);
+    var cod=a>=0?t.slice(a+MC.length,b>=0?b:t.length):t.slice(0,b>=0?b:t.length);
+    var res=b>=0?t.slice(b+MR.length):'';
+    return {codigo:limpa(cod.trim()),resumo:res.trim()};
+  }
+  function mostra(fim){
+    var c=fim?codigo:separa(texto).codigo;
+    out.innerHTML=hl(c)+(fim?'':'<span class="cursor"></span>');
+    var pre=out.parentNode; pre.scrollTop=pre.scrollHeight;
+  }
+  function agenda(){
+    if(agendado) return;
+    agendado=true;
+    requestAnimationFrame(function(){ agendado=false; if(!finalizado) mostra(false); });
+  }
+  function temClaude(){ return true; }
+  function trava(on){ ocupado=on; btn.disabled=on; ajBtn.disabled=on; }
+  function mostraResumo(r){ resTxt.textContent=r; resBox.hidden=!r; }
+  function restaura(c,r){
+    finalizado=true;
+    if(c){ codigo=c; resumo=r; mostra(true); mostraResumo(r); acoes.hidden=false; ajuste.hidden=false; }
+    else { codigo=''; out.innerHTML=''; mostraResumo(''); }
+  }
+
+  function paraImagem(f){
+    return new Promise(function(resolve,reject){
+      if(SUPORTADAS.indexOf(f.type)>=0 && f.size<=5000000){ resolve(f); return; }
+      var url=URL.createObjectURL(f), im=new Image();
+      im.onload=function(){
+        var w=im.naturalWidth||1024, h=im.naturalHeight||1024, k=Math.min(1,2048/Math.max(w,h));
+        var c=document.createElement('canvas');
+        c.width=Math.max(1,Math.round(w*k)); c.height=Math.max(1,Math.round(h*k));
+        c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+        URL.revokeObjectURL(url);
+        c.toBlob(function(b){ if(b) resolve(b); else reject(new Error('Não consegui converter esta imagem.')); },'image/png');
+      };
+      im.onerror=function(){ URL.revokeObjectURL(url); reject(new Error('O navegador não consegue ler este formato de imagem. Envie em PNG ou JPG.')); };
+      im.src=url;
+    });
+  }
+
+  var svgIA='';
+  document.addEventListener('imagem-ia',function(ev){ svgIA=ev.detail; });
+  function anexo(e){
+    var arq=null,tex=null,nomeT='';
+    function zeraImg(){ arq=null; e.imgEl.removeAttribute('src'); e.previa.hidden=true; }
+    function zeraTxt(){ tex=null; nomeT=''; e.txt.value=''; e.nomeTxt.textContent=''; e.previaTxt.hidden=true; }
+    e.usa.addEventListener('click',async function(){
+      if(!svgIA){ aviso('Gere primeiro uma imagem na seção Gerar imagem.'); return; }
+      try{
+        arq=await paraImagem(new Blob([svgIA],{type:'image/svg+xml'}));
+        var fr=new FileReader();
+        fr.onload=function(){ e.imgEl.src=fr.result; e.previa.hidden=false; };
+        fr.readAsDataURL(arq);
+      }catch(err){ zeraImg(); aviso(err.message); }
+    });
+    e.txt.addEventListener('change',function(){
+      var f=e.txt.files&&e.txt.files[0];
+      if(!f){ zeraTxt(); return; }
+      if(f.size>MAX_TXT){ zeraTxt(); aviso('Este arquivo de texto é grande demais. Use até 300 KB.'); return; }
+      var fr=new FileReader();
+      fr.onload=function(){ tex=fr.result; nomeT=f.name; e.nomeTxt.textContent=f.name; e.previaTxt.hidden=false; };
+      fr.readAsText(f,'UTF-8');
+    });
+    e.tirar.addEventListener('click',zeraImg);
+    e.tirarTxt.addEventListener('click',zeraTxt);
+    return {
+      imagem:function(){ return arq; },
+      texto:function(){ return tex?{nome:nomeT,conteudo:tex}:null; },
+      zera:function(){ zeraImg(); zeraTxt(); }
+    };
+  }
+  var anexoTopo=anexo({usa:$('usaImg'),previa:$('previa'),imgEl:$('imgprev'),tirar:$('tirar'),txt:$('txt'),previaTxt:$('previaTxt'),nomeTxt:$('nomeTxt'),tirarTxt:$('tirarTxt')});
+  var anexoAj=anexo({usa:$('usaImgAj'),previa:$('previaAj'),imgEl:$('imgprevAj'),tirar:$('tirarAj'),txt:$('txtAj'),previaTxt:$('previaTxtAj'),nomeTxt:$('nomeTxtAj'),tirarTxt:$('tirarTxtAj')});
+
+  function extras(img,txt){
+    return (img?'Foi anexada uma imagem. Use-a como referência principal. ':'')+(txt?'Foi anexado um arquivo de texto com instruções ou conteúdo. Considere-o com prioridade. ':'');
+  }
+  function blocoTxt(txt){ return txt?'\n\nARQUIVO DE TEXTO ANEXADO ('+txt.nome+'):\n'+txt.conteudo:''; }
+
+  async function prepararDownload(){
+    var dl=true;
+    if(!dl){ st.textContent+=' O download não está disponível.'; return; }
+    var ext=/<html|<!doctype/i.test(codigo)?'html':'txt';
+    if(ext==='txt') st.textContent+=' O arquivo sai em .txt; para Pawn, renomeie para .pwn.';
+    acoes.hidden=false;
+    baixar.onclick=async function(){
+      try{ var blob=new Blob([codigo],{type:'text/plain;charset=utf-8'}); var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='sistema.'+ext; a.click(); URL.revokeObjectURL(a.href); st.textContent='Arquivo salvo.'; }
+      catch(e){ st.textContent='Download não realizado. Você pode tentar de novo.'; }
+    };
+  }
+
+  async function arquivoBase64(file){return new Promise(function(resolve,reject){var fr=new FileReader();fr.onload=function(){resolve(fr.result);};fr.onerror=reject;fr.readAsDataURL(file);});}
+  async function executar(instrucao,img,msgInicio,msgFim,anterior){
+    trava(true); finalizado=false; acoes.hidden=true; ajuste.hidden=true; resBox.hidden=true;
+    st.textContent=msgInicio; texto=''; out.innerHTML='';
+    try{
+      var r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:instrucao,image:img?await arquivoBase64(img):null})});
+      if(!r.ok){var err=await r.json().catch(()=>({error:'Falha no servidor'}));throw new Error(err.error||'Falha na API');}
+      var data=await r.json(); texto=data.text||'';
+      var p=separa(texto);
+      if(!p.codigo) throw new Error('A IA não devolveu código.');
+      codigo=p.codigo; resumo=p.resumo; finalizado=true;
+      mostra(true); mostraResumo(resumo);
+      st.textContent=msgFim;
+      try{ await prepararDownload(); }catch(e){}
+      ajuste.hidden=false;
+    }catch(e){
+      restaura(anterior.codigo,anterior.resumo);
+      st.textContent='Não foi possível concluir agora.'+(e&&e.message?' '+e.message:'')+(anterior.codigo?' O código anterior foi mantido.':'');
+    }finally{ trava(false); }
+  }
+
+  async function gerar(pedido){
+    if(ocupado) return;
+    pedido=(pedido||input.value||'').trim();
+    var img=anexoTopo.imagem(), txt=anexoTopo.texto();
+    if(!pedido&&!img&&!txt){ input.focus(); return; }
+    pedidoOriginal=pedido||(txt?'Criar o sistema descrito no arquivo de texto':'Criar o sistema mostrado na imagem');
+    input.value=pedido;
+    anexoTopo.zera();
+    sec.hidden=false;
+    sec.scrollIntoView({behavior:'smooth',block:'start'});
+    var instrucao=extras(img,txt)+'Crie o sistema completo pedido abaixo, em código funcional. '+FORMATO+'\n\nPedido: '+pedidoOriginal+blocoTxt(txt);
+    await executar(instrucao,img,'O ChatGPT está criando o sistema...','Pronto! O sistema foi criado pelo ChatGPT.',{codigo:'',resumo:''});
+  }
+
+  async function ajustar(){
+    if(ocupado||!codigo) return;
+    var pedido=(ajInput.value||'').trim(), img=anexoAj.imagem(), txt=anexoAj.texto();
+    if(!pedido&&!img&&!txt){ ajInput.focus(); return; }
+    var anterior={codigo:codigo,resumo:resumo};
+    ajInput.value='';
+    anexoAj.zera();
+    var instrucao=extras(img,txt)+'Abaixo está o código atual de um sistema. Aplique a alteração pedida e devolva o código COMPLETO corrigido. Mantenha o que não foi pedido para mudar. '+FORMATO_AJ+'\n\nPedido original: '+pedidoOriginal+'\n\nCÓDIGO ATUAL:\n'+anterior.codigo+'\n\nALTERAÇÃO PEDIDA: '+(pedido||'ver o anexo')+blocoTxt(txt);
+    await executar(instrucao,img,'O ChatGPT está corrigindo o sistema...','Pronto! O sistema foi corrigido pelo ChatGPT.',anterior);
+  }
+
+  var cp=document.createElement('button');
+  cp.type='button'; cp.className='copy'; cp.textContent='Copiar';
+  cp.onclick=function(){
+    navigator.clipboard.writeText(codigo).then(function(){ cp.textContent='Copiado!'; setTimeout(function(){ cp.textContent='Copiar'; },1500); })
+      .catch(function(){ cp.textContent='Erro'; });
+  };
+  out.parentNode.appendChild(cp);
+
+  btn.onclick=function(){ gerar(); };
+  input.addEventListener('keydown',function(e){ if(e.key==='Enter') gerar(); });
+  ajBtn.onclick=function(){ ajustar(); };
+  ajInput.addEventListener('keydown',function(e){ if(e.key==='Enter') ajustar(); });
+  document.querySelectorAll('.chip').forEach(function(c){ c.onclick=function(){ gerar(c.textContent); }; });
+})();
+</script>
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id);};
+  var pedido=$('imgPedido'), btnG=$('gerarImg'), st=$('imgStatus'), res=$('imgResultado'), img=$('imgFinal'), btnB=$('baixarImg');
+  var svgAtual='';
+  function temClaude(){ return true; }
+  function extraiSvg(t){
+    var m=t.match(/<svg[\s\S]*<\/svg>/i);
+    return m?m[0]:'';
+  }
+  async function gerarImagem(){
+    var p=(pedido.value||'').trim();
+    if(!p){ pedido.focus(); return; }
+    btnG.disabled=true; res.hidden=true; st.textContent='O ChatGPT está desenhando a imagem...';
+    try{
+      var r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:'Desenhe uma ilustração em SVG para o pedido: "'+p+'". Responda somente com o código SVG completo, começando com <svg e terminando com </svg>, sem markdown e sem texto fora dele. Use viewBox="0 0 800 600", formas e cores bem definidas, sem imagens externas, sem scripts e sem foreignObject.'})});
+      if(!r.ok){var err=await r.json().catch(()=>({error:'Falha no servidor'}));throw new Error(err.error||'Falha na API');}
+      var r=await r.json();
+      var svg=extraiSvg(r.text||'');
+      if(!svg){ st.textContent='A IA não devolveu um desenho. Tente descrever de outro jeito.'; return; }
+      svgAtual=svg;
+      document.dispatchEvent(new CustomEvent('imagem-ia',{detail:svg}));
+      img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
+      res.hidden=false;
+      st.textContent='Imagem criada pelo ChatGPT. Clique em Baixar para salvar.';
+    }catch(e){
+      st.textContent='Não foi possível gerar a imagem agora.'+(e&&e.message?' '+e.message:'');
+    }finally{ btnG.disabled=false; }
+  }
+  btnB.onclick=async function(){
+    if(!svgAtual) return;
+    try{var blob=new Blob([svgAtual],{type:'image/svg+xml;charset=utf-8'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='imagem-ia.svg';a.click();URL.revokeObjectURL(a.href);st.textContent='Imagem salva.';}
+    catch(e){ st.textContent='Download não realizado. Você pode tentar de novo.'; }
+  };
+  btnG.onclick=function(){ gerarImagem(); };
+  pedido.addEventListener('keydown',function(e){ if(e.key==='Enter') gerarImagem(); });
+})();
+</script>
+</body>
+</html>
